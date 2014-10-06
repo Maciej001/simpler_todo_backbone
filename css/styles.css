@@ -1,0 +1,25 @@
+* {
+	font-family: Helvetica, sans-serif;
+}
+
+#todoapp {
+	width: 400px;
+	margin: 50px auto;
+	padding: 30px;
+	border: 1px solid #ddd;
+}
+header {
+
+}
+header h1 {
+	text-align: center;
+	color: #555;
+}
+
+input {
+	width: 370px;
+	height: 30px;
+	padding: 5px 15px;
+	border: 1px solid #ddd;
+	font-size: 1rem;
+}

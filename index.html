@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 	<meta charset="utf-8" />
-	<title>js sort</title>
+	<title>simpler Todo with Backbone.js</title>
 	<link rel="stylesheet" type="text/css" href="css/styles.css">
 
 </head>
@@ -14,7 +14,7 @@
 		  <input id="new-todo" type="text" placeholder="What needs to be done?">
 		</header>
 
-		<section id="main" style="display: block;">
+		<section id="main">
 		  <input id="toggle-all" type="checkbox">
 		  <label for="toggle-all">Mark all as complete</label>
 		  <ul id="todo-list"></ul>
@@ -27,7 +27,7 @@
 
 	</div> <!-- end todoapp -->
 
-    <script type="text/template" id="item-template">
+  <script type="text/template" id="item-template">
 		<div class="view">
 		  <input class="toggle" type="checkbox" <%= done ? 'checked="checked"' : '' %> />
 		  <label><%- title %></label>

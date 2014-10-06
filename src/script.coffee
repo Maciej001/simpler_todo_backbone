@@ -2,55 +2,109 @@ $ ->
 
 	class Todo extends Backbone.Model
 
-		defaults: ->
+		defaults:
 			title: 'empty to do...'
 			done: false
 
+		initialize: ->
+			console.log @get('title')
+
 
 	class TodoList extends Backbone.Collection
-
+		
 		model: Todo
+
 		localStorage: new Backbone.LocalStorage "todos-backbone"
+
 
 	class TodoView extends Backbone.View
 
-		tagname: 'li'
+		tagName: 'li'
 
 		template: _.template $('#item-template').html()
 
 		events:
 			"keypress .edit": 		"updateOnEnter"
 
-		initialize: -> 
-			this.listenTo this.model, 'change', this.render
+		initialize: => 
+			@listenTo @model, 'change', @render
+			console.log 'initializing TodoView'
 
-		render: ->
-			this.$el.html(this.template(this.model.toJSON()));
+		render: =>
+			@$el.html( @template( @model.toJSON() ) );
+			console.log 'rendering ...'
+			return this
 
 		updateOnEnter: (e) ->
 			console.log('enter pressed')
 
 		close: ->
 
-	class AppView extends Backbone.View
 
+	class AppView extends Backbone.View
 		el: $('#todoapp')	
 
 		events:
 			"keypress #new-todo": 	"createOnEnter"
 
-		initialize: ->
-			this.input = this.$('#new-todo');
+		initialize: =>
+			# create class variable being jQ object
+			@$input = @$('#new-todo');
+			@$main = $('#main')
+			@$footer = $('footer')
+			@$todo_list = $('#todo-list')
 
+			@listenTo Todos, 'all', @render
+			@listenTo Todos, 'add', @addOne
+			@listenTo Todos, 'reset', @addAll
+
+			# reads all items in Todos collection
+			# this triggers 'all' and @render
+			Todos.fetch()
+
+		render: ->
+			if Todos.length
+				@$main.show()
+			else
+				@$main.hide()
+			
+		@addOne: (todo) =>
+			console.log 'adding One'
+			view = new TodoView({ model: todo })
+			$('#todo-list').append(view.render().el)
+
+		@addAll: =>
+			console.log 'adding All'
+			Todos.each @addOne
+
+		# works like charm
 		createOnEnter: (e) ->
+			# exit if not 'enter' pressed or input is empty
 			return if e.keyCode isnt 13
-			return if isnt this.input.val()
+			return if not @$input.val()
 
 			# if not empty and enter pressed
-			Todos.create title: this.input.val()
+			Todos.create title: @$input.val()
 
 			# clear input
-			this.input.val ''
+			@$input.val ''
 
 	Todos = new TodoList
 	App = new AppView
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
