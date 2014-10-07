@@ -44,7 +44,6 @@
 
       function TodoView() {
         this.render = __bind(this.render, this);
-        this.initialize = __bind(this.initialize, this);
         return TodoView.__super__.constructor.apply(this, arguments);
       }
 
@@ -68,7 +67,7 @@
       };
 
       TodoView.prototype.updateOnEnter = function(e) {
-        return console.log('enter pressed');
+        return console.log('enter pressed in Todo View');
       };
 
       TodoView.prototype.close = function() {};
@@ -80,11 +79,13 @@
       __extends(AppView, _super);
 
       function AppView() {
+        this.addAll = __bind(this.addAll, this);
+        this.addOne = __bind(this.addOne, this);
         this.initialize = __bind(this.initialize, this);
         return AppView.__super__.constructor.apply(this, arguments);
       }
 
-      AppView.prototype.el = $('#todoapp');
+      AppView.prototype.el = $("#todoapp");
 
       AppView.prototype.events = {
         "keypress #new-todo": "createOnEnter"
@@ -109,18 +110,18 @@
         }
       };
 
-      AppView.addOne = function(todo) {
+      AppView.prototype.addOne = function(todo) {
         var view;
         console.log('adding One');
         view = new TodoView({
           model: todo
         });
-        return $('#todo-list').append(view.render().el);
+        return this.$('#todo-list').append(view.render().el);
       };
 
-      AppView.addAll = function() {
+      AppView.prototype.addAll = function() {
         console.log('adding All');
-        return Todos.each(AppView.addOne);
+        return Todos.each(this.addOne);
       };
 
       AppView.prototype.createOnEnter = function(e) {
@@ -130,6 +131,7 @@
         if (!this.$input.val()) {
           return;
         }
+        console.log('enter pressed in AppView');
         Todos.create({
           title: this.$input.val()
         });

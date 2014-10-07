@@ -1,3 +1,4 @@
+# Load the application when DOM ready
 $ ->
 
 	class Todo extends Backbone.Model
@@ -9,7 +10,7 @@ $ ->
 		initialize: ->
 			console.log @get('title')
 
-
+	# Collection of todos is saved in loacal storage
 	class TodoList extends Backbone.Collection
 		
 		model: Todo
@@ -21,12 +22,12 @@ $ ->
 
 		tagName: 'li'
 
-		template: _.template $('#item-template').html()
+		template: _.template( $('#item-template').html())
 
 		events:
 			"keypress .edit": 		"updateOnEnter"
 
-		initialize: => 
+		initialize: -> 
 			@listenTo @model, 'change', @render
 			console.log 'initializing TodoView'
 
@@ -36,13 +37,13 @@ $ ->
 			return this
 
 		updateOnEnter: (e) ->
-			console.log('enter pressed')
+			console.log('enter pressed in Todo View')
 
 		close: ->
 
 
 	class AppView extends Backbone.View
-		el: $('#todoapp')	
+		el: $("#todoapp")	
 
 		events:
 			"keypress #new-todo": 	"createOnEnter"
@@ -68,12 +69,13 @@ $ ->
 			else
 				@$main.hide()
 			
-		@addOne: (todo) =>
+		addOne: (todo) =>
 			console.log 'adding One'
-			view = new TodoView({ model: todo })
-			$('#todo-list').append(view.render().el)
 
-		@addAll: =>
+			view = new TodoView({ model: todo })
+			@$('#todo-list').append(view.render().el)
+
+		addAll: =>
 			console.log 'adding All'
 			Todos.each @addOne
 
@@ -82,6 +84,7 @@ $ ->
 			# exit if not 'enter' pressed or input is empty
 			return if e.keyCode isnt 13
 			return if not @$input.val()
+			console.log 'enter pressed in AppView'
 
 			# if not empty and enter pressed
 			Todos.create title: @$input.val()
