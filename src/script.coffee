@@ -3,12 +3,14 @@ $ ->
 
 	class Todo extends Backbone.Model
 
-		defaults:
+		defaults: ->
 			title: 'empty to do...'
 			done: false
+			order: Todos.nextOrder()
 
-		initialize: ->
-			console.log @get('title')
+		# change done to false if true and to true if false
+		toggle: ->
+			@save done: not @get('done')
 
 	# Collection of todos is saved in loacal storage
 	class TodoList extends Backbone.Collection
@@ -16,6 +18,10 @@ $ ->
 		model: Todo
 
 		localStorage: new Backbone.LocalStorage "todos-backbone"
+
+		nextOrder: ->
+			return 1 if not @length
+			return @last().get('order') + 1
 
 
 	class TodoView extends Backbone.View
@@ -25,19 +31,31 @@ $ ->
 		template: _.template( $('#item-template').html())
 
 		events:
-			"keypress .edit": 		"updateOnEnter"
+			"click .toggle":					"toggelDone"
+			"keypress .edit": 				"updateOnEnter"
+			"click span.destroy":			"removeItem"
 
 		initialize: -> 
 			@listenTo @model, 'change', @render
-			console.log 'initializing TodoView'
+			@listenTo @model, 'destroy', @remove
 
 		render: =>
 			@$el.html( @template( @model.toJSON() ) );
-			console.log 'rendering ...'
 			return this
 
 		updateOnEnter: (e) ->
 			console.log('enter pressed in Todo View')
+
+		# removes item from collection and destroys
+		removeItem: =>
+			# it's not enought just to destroy the model
+			# you have to listen to destroy on model and trigger remove action
+			console.log this
+			this.model.destroy()
+
+		toggelDone: ->
+			@model.toggle()
+
 
 		close: ->
 
@@ -70,8 +88,6 @@ $ ->
 				@$main.hide()
 			
 		addOne: (todo) =>
-			console.log 'adding One'
-
 			view = new TodoView({ model: todo })
 			@$('#todo-list').append(view.render().el)
 
@@ -84,7 +100,6 @@ $ ->
 			# exit if not 'enter' pressed or input is empty
 			return if e.keyCode isnt 13
 			return if not @$input.val()
-			console.log 'enter pressed in AppView'
 
 			# if not empty and enter pressed
 			Todos.create title: @$input.val()

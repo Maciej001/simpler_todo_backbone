@@ -4,6 +4,7 @@
 	<meta charset="utf-8" />
 	<title>simpler Todo with Backbone.js</title>
 	<link rel="stylesheet" type="text/css" href="css/styles.css">
+	<link rel="stylesheet" type="text/css" href="../lib/font-awesome-4.2.0/css/font-awesome.min.css">
 	<script src="../lib/jquery-1.11.1.min.js"></script>
 	<script src="../lib/underscore-min.js"></script>
 	<script src="../lib/backbone-min.js"></script>
@@ -36,11 +37,10 @@
 		<div class="view">
 		  <input class="toggle" type="checkbox" <%= done ? 'checked="checked"' : '' %> />
 		  <label><%- title %></label>
-		  <a class="destroy"></a>
+		  <span class="destroy"><i class="fa fa-trash"></i></span>
 		</div>
 		<input class="edit" type="text" value="<%- title %>" />
 	</script>
 	
-
 </body>
 </html>

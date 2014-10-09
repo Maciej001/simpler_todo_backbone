@@ -13,13 +13,18 @@
         return Todo.__super__.constructor.apply(this, arguments);
       }
 
-      Todo.prototype.defaults = {
-        title: 'empty to do...',
-        done: false
+      Todo.prototype.defaults = function() {
+        return {
+          title: 'empty to do...',
+          done: false,
+          order: Todos.nextOrder()
+        };
       };
 
-      Todo.prototype.initialize = function() {
-        return console.log(this.get('title'));
+      Todo.prototype.toggle = function() {
+        return this.save({
+          done: !this.get('done')
+        });
       };
 
       return Todo;
@@ -36,6 +41,13 @@
 
       TodoList.prototype.localStorage = new Backbone.LocalStorage("todos-backbone");
 
+      TodoList.prototype.nextOrder = function() {
+        if (!this.length) {
+          return 1;
+        }
+        return this.last().get('order') + 1;
+      };
+
       return TodoList;
 
     })(Backbone.Collection);
@@ -43,6 +55,7 @@
       __extends(TodoView, _super);
 
       function TodoView() {
+        this.removeItem = __bind(this.removeItem, this);
         this.render = __bind(this.render, this);
         return TodoView.__super__.constructor.apply(this, arguments);
       }
@@ -52,22 +65,32 @@
       TodoView.prototype.template = _.template($('#item-template').html());
 
       TodoView.prototype.events = {
-        "keypress .edit": "updateOnEnter"
+        "click .toggle": "toggelDone",
+        "keypress .edit": "updateOnEnter",
+        "click span.destroy": "removeItem"
       };
 
       TodoView.prototype.initialize = function() {
         this.listenTo(this.model, 'change', this.render);
-        return console.log('initializing TodoView');
+        return this.listenTo(this.model, 'destroy', this.remove);
       };
 
       TodoView.prototype.render = function() {
         this.$el.html(this.template(this.model.toJSON()));
-        console.log('rendering ...');
         return this;
       };
 
       TodoView.prototype.updateOnEnter = function(e) {
         return console.log('enter pressed in Todo View');
+      };
+
+      TodoView.prototype.removeItem = function() {
+        console.log(this);
+        return this.model.destroy();
+      };
+
+      TodoView.prototype.toggelDone = function() {
+        return this.model.toggle();
       };
 
       TodoView.prototype.close = function() {};
@@ -112,7 +135,6 @@
 
       AppView.prototype.addOne = function(todo) {
         var view;
-        console.log('adding One');
         view = new TodoView({
           model: todo
         });
@@ -131,7 +153,6 @@
         if (!this.$input.val()) {
           return;
         }
-        console.log('enter pressed in AppView');
         Todos.create({
           title: this.$input.val()
         });
