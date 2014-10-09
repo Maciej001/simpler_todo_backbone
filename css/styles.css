@@ -169,6 +169,7 @@ input#toggle-all {
 	-o-transition: all 0.3;
 	-ms-transition: all 0.3s;
 	background: #EB613E;
+	cursor: pointer;
 }
 
 span .number-done, span .word-done {

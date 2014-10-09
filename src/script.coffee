@@ -12,6 +12,10 @@ $ ->
 		toggle: ->
 			@save done: not @get('done')
 
+		remove_todo: =>
+			@destroy()
+			
+
 	# Collection of todos is saved in loacal storage
 	class TodoList extends Backbone.Collection
 		
@@ -30,9 +34,6 @@ $ ->
 
 		remainingItems: ->
 			@where done: false
-
-
-
 
 	class TodoView extends Backbone.View
 
@@ -75,6 +76,7 @@ $ ->
 		statsTemplate: _.template( $("#stats-template").html() )
 
 		events:
+			"click .todo-clear": 		"clearCompleted"
 			"keypress #new-todo": 	"createOnEnter"
 
 		initialize: =>
@@ -97,8 +99,6 @@ $ ->
 			remaining = Todos.remainingItems().length
 			total = Todos.length
 
-			
-			
 			if total
 				@$main.show()
 				@$footer.show()
@@ -130,6 +130,10 @@ $ ->
 
 			# clear input
 			@$input.val ''
+
+		clearCompleted: ->
+			_.each(Todos.doneItems(), (todo) -> todo.remove_todo()) 
+			return false
 
 	Todos = new TodoList
 	App = new AppView
