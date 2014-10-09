@@ -21,8 +21,10 @@
 		</header>
 
 		<section id="main">
-		  <input id="toggle-all" type="checkbox">
-		  <label for="toggle-all">Mark all as complete</label>
+			<div class="toggle-all-wrapper">
+			  <input id="toggle-all" type="checkbox">
+			  <label for="toggle-all">Mark all as complete</label>
+		  </div>
 		  <ul id="todo-list"></ul>
 		</section>
 
@@ -41,6 +43,23 @@
 		</div>
 		<input class="edit" type="text" value="<%- title %>" />
 	</script>
+
+	<script type="text/template" id="stats-template">
+    <% if (total) { %>
+      <span class="todo-count">
+        <span class="number"><%= remaining %></span>
+        <span class="word"><%= remaining == 1 ? 'item' : 'items' %></span> left.
+      </span>
+    <% } %>
+    <% if (done) { %>
+      <span class="todo-clear">
+        <a href="#">
+          Clear <span class="number-done"><%= done %></span>
+          completed <span class="word-done"><%= done == 1 ? 'item' : 'items' %></span>
+        </a>
+      </span>
+    <% } %>
+  </script>
 	
 </body>
 </html>

@@ -39,6 +39,8 @@
 
       TodoList.prototype.model = Todo;
 
+      TodoList.prototype.comparator = 'order';
+
       TodoList.prototype.localStorage = new Backbone.LocalStorage("todos-backbone");
 
       TodoList.prototype.nextOrder = function() {
@@ -46,6 +48,18 @@
           return 1;
         }
         return this.last().get('order') + 1;
+      };
+
+      TodoList.prototype.doneItems = function() {
+        return this.where({
+          done: true
+        });
+      };
+
+      TodoList.prototype.remainingItems = function() {
+        return this.where({
+          done: false
+        });
       };
 
       return TodoList;
@@ -85,7 +99,6 @@
       };
 
       TodoView.prototype.removeItem = function() {
-        console.log(this);
         return this.model.destroy();
       };
 
@@ -110,6 +123,8 @@
 
       AppView.prototype.el = $("#todoapp");
 
+      AppView.prototype.statsTemplate = _.template($("#stats-template").html());
+
       AppView.prototype.events = {
         "keypress #new-todo": "createOnEnter"
       };
@@ -126,10 +141,21 @@
       };
 
       AppView.prototype.render = function() {
-        if (Todos.length) {
-          return this.$main.show();
+        var done, remaining, total;
+        done = Todos.doneItems().length;
+        remaining = Todos.remainingItems().length;
+        total = Todos.length;
+        if (total) {
+          this.$main.show();
+          this.$footer.show();
+          return this.$footer.html(this.statsTemplate({
+            total: total,
+            remaining: remaining,
+            done: done
+          }));
         } else {
-          return this.$main.hide();
+          this.$main.hide();
+          return this.$footer.hide();
         }
       };
 
@@ -142,7 +168,6 @@
       };
 
       AppView.prototype.addAll = function() {
-        console.log('adding All');
         return Todos.each(this.addOne);
       };
 

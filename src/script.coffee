@@ -17,11 +17,21 @@ $ ->
 		
 		model: Todo
 
+		comparator: 'order'
+
 		localStorage: new Backbone.LocalStorage "todos-backbone"
 
 		nextOrder: ->
 			return 1 if not @length
 			return @last().get('order') + 1
+
+		doneItems: ->
+			@where done: true
+
+		remainingItems: ->
+			@where done: false
+
+
 
 
 	class TodoView extends Backbone.View
@@ -50,18 +60,19 @@ $ ->
 		removeItem: =>
 			# it's not enought just to destroy the model
 			# you have to listen to destroy on model and trigger remove action
-			console.log this
 			this.model.destroy()
 
 		toggelDone: ->
 			@model.toggle()
-
 
 		close: ->
 
 
 	class AppView extends Backbone.View
 		el: $("#todoapp")	
+
+		# template to display statistics at the bottom of the application
+		statsTemplate: _.template( $("#stats-template").html() )
 
 		events:
 			"keypress #new-todo": 	"createOnEnter"
@@ -82,17 +93,30 @@ $ ->
 			Todos.fetch()
 
 		render: ->
-			if Todos.length
+			done = Todos.doneItems().length
+			remaining = Todos.remainingItems().length
+			total = Todos.length
+
+			
+			
+			if total
 				@$main.show()
+				@$footer.show()
+				@$footer.html( @statsTemplate
+						total: 			total
+						remaining: 	remaining
+						done: 			done
+					)
 			else
 				@$main.hide()
+				@$footer.hide()
+
 			
 		addOne: (todo) =>
 			view = new TodoView({ model: todo })
 			@$('#todo-list').append(view.render().el)
 
 		addAll: =>
-			console.log 'adding All'
 			Todos.each @addOne
 
 		# works like charm
