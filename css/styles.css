@@ -47,6 +47,9 @@ ul {
 	padding: 50px 30px;
 	border: 1px solid #ddd;
 	background: #eee;
+	-webkit-box-shadow: -7px 7px 37px 0px rgba(0,0,0,0.5);
+	-moz-box-shadow: -7px 7px 37px 0px rgba(0,0,0,0.5);
+	box-shadow: -7px 7px 37px 0px rgba(0,0,0,0.5);
 }
 
 header h1 {

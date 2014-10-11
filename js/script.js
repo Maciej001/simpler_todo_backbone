@@ -108,7 +108,12 @@
       };
 
       TodoView.prototype.toggelDone = function() {
-        return this.model.toggle();
+        this.model.toggle();
+        if (Todos.doneItems().length === Todos.length) {
+          return App.$allCheckbox.checked = true;
+        } else {
+          return App.$allCheckbox.checked = false;
+        }
       };
 
       TodoView.prototype.close = function() {};
@@ -132,7 +137,9 @@
 
       AppView.prototype.events = {
         "click .todo-clear": "clearCompleted",
-        "keypress #new-todo": "createOnEnter"
+        "click #toggle-all": "toggleAll",
+        "keypress #new-todo": "createOnEnter",
+        "change .toggle": "checkToggleAll"
       };
 
       AppView.prototype.initialize = function() {
@@ -140,6 +147,7 @@
         this.$main = $('#main');
         this.$footer = $('footer');
         this.$todo_list = $('#todo-list');
+        this.$allCheckbox = $('#toggle-all')[0];
         this.listenTo(Todos, 'all', this.render);
         this.listenTo(Todos, 'add', this.addOne);
         this.listenTo(Todos, 'reset', this.addAll);
@@ -195,6 +203,18 @@
           return todo.remove_todo();
         });
         return false;
+      };
+
+      AppView.prototype.toggleAll = function() {
+        var done;
+        done = this.$allCheckbox.checked;
+        console.log($('#toggle-all'));
+        console.log(done);
+        return Todos.each(function(todo) {
+          return todo.save({
+            done: done
+          });
+        });
       };
 
       return AppView;

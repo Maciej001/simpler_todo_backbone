@@ -66,6 +66,12 @@ $ ->
 		toggelDone: ->
 			@model.toggle()
 
+			# check if all checkboxes are checked and if so check Mark-all-as-complete
+			if Todos.doneItems().length is Todos.length
+				App.$allCheckbox.checked = true
+			else
+				App.$allCheckbox.checked = false
+
 		close: ->
 
 
@@ -77,14 +83,16 @@ $ ->
 
 		events:
 			"click .todo-clear": 		"clearCompleted"
+			"click #toggle-all": 		"toggleAll"
 			"keypress #new-todo": 	"createOnEnter"
-
+			"change .toggle": 				"checkToggleAll"
 		initialize: =>
 			# create class variable being jQ object
 			@$input = @$('#new-todo');
 			@$main = $('#main')
 			@$footer = $('footer')
 			@$todo_list = $('#todo-list')
+			@$allCheckbox = $('#toggle-all')[0]
 
 			@listenTo Todos, 'all', @render
 			@listenTo Todos, 'add', @addOne
@@ -134,6 +142,15 @@ $ ->
 		clearCompleted: ->
 			_.each(Todos.doneItems(), (todo) -> todo.remove_todo()) 
 			return false
+
+		toggleAll: ->
+			done = @$allCheckbox.checked;
+			console.log $('#toggle-all')
+			console.log done
+			Todos.each (todo) ->
+				todo.save
+					done: done
+
 
 	Todos = new TodoList
 	App = new AppView
