@@ -75,6 +75,7 @@
 
       function TodoView() {
         this.removeItem = __bind(this.removeItem, this);
+        this.updateOnEnter = __bind(this.updateOnEnter, this);
         this.render = __bind(this.render, this);
         return TodoView.__super__.constructor.apply(this, arguments);
       }
@@ -86,7 +87,9 @@
       TodoView.prototype.events = {
         "click .toggle": "toggelDone",
         "keypress .edit": "updateOnEnter",
-        "click span.destroy": "removeItem"
+        "click span.destroy": "removeItem",
+        "dblclick .view": "edit",
+        "blur .edit": "close"
       };
 
       TodoView.prototype.initialize = function() {
@@ -96,11 +99,15 @@
 
       TodoView.prototype.render = function() {
         this.$el.html(this.template(this.model.toJSON()));
+        this.$input = this.$('.edit');
         return this;
       };
 
       TodoView.prototype.updateOnEnter = function(e) {
-        return console.log('enter pressed in Todo View');
+        console.log('enter');
+        if (e.keyCode === 13) {
+          return this.close;
+        }
       };
 
       TodoView.prototype.removeItem = function() {
@@ -109,14 +116,29 @@
 
       TodoView.prototype.toggelDone = function() {
         this.model.toggle();
-        if (Todos.doneItems().length === Todos.length) {
-          return App.$allCheckbox.checked = true;
-        } else {
-          return App.$allCheckbox.checked = false;
-        }
+        return console.log(Todos.length);
       };
 
-      TodoView.prototype.close = function() {};
+      TodoView.prototype.edit = function() {
+        var string_length;
+        this.$el.addClass('editing');
+        string_length = this.$input.val().length;
+        this.$input.focus();
+        return this.$input[0].setSelectionRange(0, string_length);
+      };
+
+      TodoView.prototype.close = function() {
+        var value;
+        value = this.$input.val();
+        if (!value) {
+          return this.removeItem();
+        } else {
+          this.model.save({
+            title: value
+          });
+          return this.$el.removeClass('editing');
+        }
+      };
 
       return TodoView;
 
@@ -138,8 +160,7 @@
       AppView.prototype.events = {
         "click .todo-clear": "clearCompleted",
         "click #toggle-all": "toggleAll",
-        "keypress #new-todo": "createOnEnter",
-        "change .toggle": "checkToggleAll"
+        "keypress #new-todo": "createOnEnter"
       };
 
       AppView.prototype.initialize = function() {
@@ -208,8 +229,6 @@
       AppView.prototype.toggleAll = function() {
         var done;
         done = this.$allCheckbox.checked;
-        console.log($('#toggle-all'));
-        console.log(done);
         return Todos.each(function(todo) {
           return todo.save({
             done: done

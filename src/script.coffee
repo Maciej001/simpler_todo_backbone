@@ -45,6 +45,8 @@ $ ->
 			"click .toggle":					"toggelDone"
 			"keypress .edit": 				"updateOnEnter"
 			"click span.destroy":			"removeItem"
+			"dblclick .view":					"edit"
+			"blur .edit":							"close"
 
 		initialize: -> 
 			@listenTo @model, 'change', @render
@@ -52,10 +54,12 @@ $ ->
 
 		render: =>
 			@$el.html( @template( @model.toJSON() ) );
+			@$input = @$('.edit')
 			return this
 
-		updateOnEnter: (e) ->
-			console.log('enter pressed in Todo View')
+		updateOnEnter: (e) =>
+			console.log 'enter'
+			@close if e.keyCode is 13
 
 		# removes item from collection and destroys
 		removeItem: =>
@@ -65,14 +69,25 @@ $ ->
 
 		toggelDone: ->
 			@model.toggle()
+			console.log Todos.length
 
-			# check if all checkboxes are checked and if so check Mark-all-as-complete
-			if Todos.doneItems().length is Todos.length
-				App.$allCheckbox.checked = true
-			else
-				App.$allCheckbox.checked = false
+		edit: ->
+			@$el.addClass('editing')
+			string_length = @$input.val().length
+			@$input.focus()
+
+			# select text inside input from 0 to string_length character meaning to the end 
+			@$input[0].setSelectionRange(0, string_length)
 
 		close: ->
+			value = @$input.val()
+
+			if not value
+				@removeItem()
+			else
+				@model.save
+					title: value
+				@$el.removeClass('editing')
 
 
 	class AppView extends Backbone.View
@@ -85,7 +100,7 @@ $ ->
 			"click .todo-clear": 		"clearCompleted"
 			"click #toggle-all": 		"toggleAll"
 			"keypress #new-todo": 	"createOnEnter"
-			"change .toggle": 				"checkToggleAll"
+
 		initialize: =>
 			# create class variable being jQ object
 			@$input = @$('#new-todo');
@@ -119,7 +134,6 @@ $ ->
 				@$main.hide()
 				@$footer.hide()
 
-			
 		addOne: (todo) =>
 			view = new TodoView({ model: todo })
 			@$('#todo-list').append(view.render().el)
@@ -145,8 +159,6 @@ $ ->
 
 		toggleAll: ->
 			done = @$allCheckbox.checked;
-			console.log $('#toggle-all')
-			console.log done
 			Todos.each (todo) ->
 				todo.save
 					done: done
