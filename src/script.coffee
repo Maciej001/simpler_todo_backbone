@@ -13,10 +13,10 @@ $ ->
 			@save done: not @get('done')
 
 		remove_todo: =>
-			@destroy()
+			@destroy() 
 			
 
-	# Collection of todos is saved in loacal storage
+	# Collection of todos is saved in local storage
 	class TodoList extends Backbone.Collection
 		
 		model: Todo
@@ -25,10 +25,12 @@ $ ->
 
 		localStorage: new Backbone.LocalStorage "todos-backbone"
 
+		# generates id number for each item
 		nextOrder: ->
 			return 1 if not @length
 			return @last().get('order') + 1
 
+		# Filters the collection
 		doneItems: ->
 			@where done: true
 
@@ -58,7 +60,6 @@ $ ->
 			return this
 
 		updateOnEnter: (e) =>
-			console.log 'enter'
 			@close if e.keyCode is 13
 
 		# removes item from collection and destroys
@@ -69,7 +70,6 @@ $ ->
 
 		toggelDone: ->
 			@model.toggle()
-			console.log Todos.length
 
 		edit: ->
 			@$el.addClass('editing')
